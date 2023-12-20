@@ -3,6 +3,7 @@ import websockets
 import aiomysql
 import json
 from datetime import datetime
+from connect_websocket import receive_updates
 
 
 async def handle_websocket(websocket, path):
@@ -31,7 +32,7 @@ async def handle_websocket(websocket, path):
 
                             if result:
                                 for row in result:
-                                    row['action_time'] = row['action_time'].strftime('%m-%d %H:%M')
+                                    row['action_time'] = row['action_time'].strftime('%d-%m %H:%M')
 
                                 await websocket.send(json.dumps(result))
                                 last_id = result[-1].get('id')
@@ -47,4 +48,5 @@ async def handle_websocket(websocket, path):
 if __name__ == "__main__":
     start_server = websockets.serve(handle_websocket, "localhost", 8765)
     asyncio.get_event_loop().run_until_complete(start_server)
+    asyncio.get_event_loop().run_until_complete(receive_updates())
     asyncio.get_event_loop().run_forever()
